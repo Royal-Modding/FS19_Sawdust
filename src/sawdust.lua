@@ -10,7 +10,7 @@ InitRoyalUtility(Utils.getFilename("lib/utility/", g_currentModDirectory))
 ---@class Sawdust : RoyalMod
 Sawdust = RoyalMod.new(r_debug_r, false)
 Sawdust.directory = g_currentModDirectory
-Sawdust.totalSawdust = 2
+Sawdust.sawdustScale = 2
 Sawdust.woodHarvesterCounter = 0
 Sawdust.treeSawCounter = 0
 Sawdust.stumpCutterCounter = 0
@@ -84,41 +84,13 @@ function Sawdust:onReadStream(streamId)
 end
 
 function Sawdust:onUpdate(dt)
-
     self.showHelp = false
-
-    if g_currentMission.controlledVehicle ~= nil then
-        if g_currentMission.controlledVehicle.spec_woodHarvester ~= nil then
-            if g_currentMission.controlledVehicle.spec_woodHarvester.cutNode ~= nil then
-                self:processWoodHarvester()
-            end
-        end
-
-        if #g_currentMission.controlledVehicle.spec_attacherJoints.attachedImplements > 0 then
-            for _, cutimplement in pairs(g_currentMission.controlledVehicle.spec_attacherJoints.attachedImplements) do
-                local vehicle = cutimplement.object
-                if vehicle.spec_stumpCutter ~= nil then
-                    if vehicle.spec_stumpCutter.cutNode ~= nil then
-                        self:processStumpCutter(vehicle.spec_stumpCutter)
-                    end
-                end
-                if vehicle.spec_treeSaw ~= nil then
-                    if vehicle.spec_treeSaw.cutNode ~= nil then
-                        self:processTreeSaw(vehicle.spec_treeSaw)
-                    end
-                end
-            end
-        end
-    end
-
     if g_currentMission.player and g_currentMission.player.baseInformation.currentHandtool and g_currentMission.player.baseInformation.currentHandtool.cutNode then
         self:processChainsaw()
     end
-
     if self.showHelp then
-        g_currentMission:addExtraPrintText(g_i18n:getText("SW_DESCLEVEL") .. " " .. tostring(self.totalSawdust));
+        g_currentMission:addExtraPrintText(g_i18n:getText("SW_DESCLEVEL") .. " " .. tostring(self.sawdustScale))
     end
-
 end
 
 function Sawdust:onUpdateTick(dt)
@@ -134,10 +106,27 @@ function Sawdust:onMouseEvent(posX, posY, isDown, isUp, button)
 end
 
 function Sawdust:onKeyEvent(unicode, sym, modifier, isDown)
+    if not isDown then
+        return
+    end
+
+    if self.showHelp == false then
+        return
+    end
+    if sym == Input.KEY_z then
+        if self.sawdustScale == 0 then
+            self.sawdustScale = 3
+        elseif self.sawdustScale == 3 then
+            self.sawdustScale = 2
+        elseif self.sawdustScale == 2 then
+            self.sawdustScale = 1
+        elseif self.sawdustScale == 1 then
+            self.sawdustScale = 0
+        end
+    end
 end
 
 function Sawdust:onDraw()
-
 end
 
 function Sawdust:onPreSaveSavegame(savegameDirectory, savegameIndex)
@@ -152,53 +141,13 @@ end
 function Sawdust:onDeleteMap()
 end
 
-function Sawdust:keyEvent(unicode, sym, modifier, isDown)
-
-    if not isDown then
-        return
-    end
-
-    if self.showHelp == false then
-        return
-    end
-
-    if sym == Input.KEY_z then
-        if self.totalSawdust == 0 then
-            self.totalSawdust = 3
-        elseif self.totalSawdust == 3 then
-            self.totalSawdust = 2
-        elseif self.totalSawdust == 2 then
-            self.totalSawdust = 1
-        elseif self.totalSawdust == 1 then
-            self.totalSawdust = 0
-        end
-    end
-
-end
-
-function Sawdust:processWoodHarvester()
-    self.showHelp = true
-    if g_currentMission.controlledVehicle.spec_woodHarvester.hasAttachedSplitShape then
-        if g_currentMission.controlledVehicle.spec_woodHarvester.cutTimer > 1 then
-            self.woodHarvesterCounter = self.woodHarvesterCounter + (1 * self.totalSawdust)
-        end
-        if g_currentMission.controlledVehicle.spec_woodHarvester.isAttachedSplitShapeMoving then
-            self.woodHarvesterCounter = self.woodHarvesterCounter + (math.random(2, 4) * self.totalSawdust)
-        end
-    end
-    if self.woodHarvesterCounter > 220 then
-        local x, y, z = getWorldTranslation(g_currentMission.controlledVehicle.spec_woodHarvester.cutNode)
-        self:addChipToGround(x, y, z, self:calcDelta(AmountTypes.WOODHARVESTER_CUT))
-        self.woodHarvesterCounter = 0
-    end
-end
 
 function Sawdust:processTreeSaw(object)
     self.showHelp = true
     local workingToolNode = object.cutNode
     if workingToolNode ~= nil then -- workaround per i coglioni che usano i treesaw senza un cutnode
         if object.isCutting then
-            self.treeSawCounter = self.treeSawCounter + (1 * self.totalSawdust)
+            self.treeSawCounter = self.treeSawCounter + (1 * self.sawdustScale)
         end
         if self.treeSawCounter > 150 then
             local x, y, z = getWorldTranslation(workingToolNode)
@@ -211,7 +160,7 @@ end
 function Sawdust:processStumpCutter(object)
     self.showHelp = true
     if object.curSplitShape ~= nil then
-        self.stumpCutterCounter = self.stumpCutterCounter + (1 * self.totalSawdust)
+        self.stumpCutterCounter = self.stumpCutterCounter + (1 * self.sawdustScale)
     end
     if self.stumpCutterCounter > 200 then
         local x, y, z = getWorldTranslation(object.stumpCutterCutNode)
@@ -224,8 +173,8 @@ function Sawdust:processChainsaw()
     self.showHelp = true
     -- chainsaw delimb
     if g_currentMission.player.baseInformation.currentHandtool.particleSystems[1].isEmitting and not g_currentMission.player.baseInformation.currentHandtool.isCutting then
-        if math.random(10) > (8 - self.totalSawdust) then
-            self.chainsawCounter = self.chainsawCounter + (1 * self.totalSawdust)
+        if math.random(10) > (8 - self.sawdustScale) then
+            self.chainsawCounter = self.chainsawCounter + (1 * self.sawdustScale)
         end
         if self.chainsawCounter > 100 then
             local x, y, z = getWorldTranslation(g_currentMission.player.baseInformation.currentHandtool.cutNode)
@@ -235,7 +184,7 @@ function Sawdust:processChainsaw()
     end
     -- chainsaw cut
     if g_currentMission.player.baseInformation.currentHandtool.isCutting then
-        self.chainsawCounter = self.chainsawCounter + (1 * self.totalSawdust)
+        self.chainsawCounter = self.chainsawCounter + (1 * self.sawdustScale)
         if g_currentMission.player.baseInformation.currentHandtool.waitingForResetAfterCut then
             if g_currentMission.player.baseInformation.currentHandtool.isHorizontalCut and self.chainsawCounter > 220 then
                 local x, y, z = getWorldTranslation(g_currentMission.player.baseInformation.currentHandtool.cutNode)
@@ -270,11 +219,11 @@ function Sawdust:calcDelta(type)
     local testDrop = g_densityMapHeightManager:getMinValidLiterValue(fillTypeIndex)
     --return math.max(DensityMapHeightManager.getMinValidLiterValue(fillTypeIndex), amount * self.totalSawdust);
     print("testDrop: " .. tostring(testDrop))
-    return amount * self.totalSawdust
+    return amount * self.sawdustScale
 end
 
 function Sawdust:addChipToGround(x, y, z, amount)
-    if self.totalSawdust > 0 then
+    if self.sawdustScale > 0 then
         if g_currentMission:getIsServer() then
             local xzRndm = ((math.random(1, 20)) - 10) / 10
             local xOffset = math.max(math.min(xzRndm, 0.3), -0.3)
@@ -282,10 +231,8 @@ function Sawdust:addChipToGround(x, y, z, amount)
             local ex = x + xOffset
             local ey = y - 0.1
             local ez = z + zOffset
-            local fillTypeIndex = g_fillTypeManager:getFillTypeIndexByName("WOODCHIPS")
-            local outerRadius = DensityMapHeightUtil.getDefaultMaxRadius(fillTypeIndex)
-            local dropped, lineOffset = DensityMapHeightUtil.tipToGroundAroundLine(nil, amount, fillTypeIndex, x, y, z, ex, ey, ez, 0, outerRadius, 1, false, nil)
-            print("dropped: " .. tostring(dropped) .. "lineOffset: " .. tostring(lineOffset))
+            local outerRadius = DensityMapHeightUtil.getDefaultMaxRadius(FillType.WOODCHIPS)
+            local dropped, lineOffset = DensityMapHeightUtil.tipToGroundAroundLine(nil, amount, FillType.WOODCHIPS, x, y, z, ex, ey, ez, 0, outerRadius, 1, false, nil)
         else
             g_client:getServerConnection():sendEvent(SawdustEvent:new(x, y, z, amount))
         end
