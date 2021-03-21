@@ -33,31 +33,38 @@ Le mod Sciure simule la chute de copeaux de bois au sol lors de l'abattage d'arb
 		<sourceFile filename="lib/rmod/Main.lua" />
 		<sourceFile filename="lib/utility/Main.lua" />
 		<sourceFile filename="sawdust.lua" />
+		<sourceFile filename="ExtendedPlayerChainsaw.lua" />
 	</extraSourceFiles>
+
+	<actions>
+		<action name="SAWDUST_ONOFF" axisType="HALF" />
+	</actions>
+
+	<inputBinding>
+		<actionBinding action="SAWDUST_ONOFF">
+			<binding device="KB_MOUSE_DEFAULT" input="KEY_z" />
+		</actionBinding>
+	</inputBinding>
+
+	<l10n>
+		<text name="input_SAWDUST_ONOFF">
+			<en>Sawdust enabled/disabled</en>
+			<de>Sawdust enabled/disabled</de>
+			<fr>Sawdust enabled/disabled</fr>
+			<it>Abilita/Disabilita generazione segatura</it>
+		</text>
+		<text name="SAWDUST_ENABLED">
+			<en>Sawdust dirt enabled</en>
+			<de>Sawdust dirt enabled</de>
+			<fr>Sawdust dirt enabled</fr>
+			<it>Generazione segatura abilitata</it>
+		</text>
+		<text name="SAWDUST_DISABLED">
+			<en>Sawdust dirt disabled</en>
+			<de>Sawdust dirt disabled</de>
+			<fr>Sawdust dirt disabled</fr>
+			<it>Generazione segatura disabilitata</it>
+		</text>
+	</l10n>
+
 </modDesc>
-
-
-<actions>
-	<action name="SW_CHANGE_LEVEL" axisType="HALF" />
-</actions>
-
-<inputBinding>
-	<actionBinding action="SW_CHANGE_LEVEL">
-		<binding device="KB_MOUSE_DEFAULT" input="KEY_z" />
-	</actionBinding>
-</inputBinding>
-
-<l10n>
-	<text name="input_SW_CHANGE_LEVEL">
-		<en>Change sawdust dirt level</en>
-		<de>Änderung Sägemehl Schmutz Ebene</de>
-		<fr>Modifier le niveau de la crasseux sciure</fr>
-		<it>Cambia livello di sporco da segatura</it>
-	</text>
-	<text name="SW_DESCLEVEL">
-		<en>Sawdust dirt level: </en>
-		<de>Sägemehl Schmutz Ebene: </de>
-		<fr>Niveau de la crasseux sciure: </fr>
-		<it>Livello di sporco da segatura: </it>
-	</text>
-</l10n>

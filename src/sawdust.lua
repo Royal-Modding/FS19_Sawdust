@@ -10,23 +10,19 @@ InitRoyalUtility(Utils.getFilename("lib/utility/", g_currentModDirectory))
 ---@class Sawdust : RoyalMod
 Sawdust = RoyalMod.new(r_debug_r, false)
 Sawdust.directory = g_currentModDirectory
-Sawdust.sawdustScale = 2
-Sawdust.woodHarvesterCounter = 0
-Sawdust.treeSawCounter = 0
-Sawdust.stumpCutterCounter = 0
-Sawdust.chainsawCounter = 0
-Sawdust.showHelp = false
-
-AmountTypes = {}
-AmountTypes.WOODHARVESTER_CUT = 0
-AmountTypes.TREESAW_CUT = 1
-AmountTypes.STUPCUTTER_CUT = 2
-AmountTypes.CHAINSAW_DELIMB = 3
-AmountTypes.CHAINSAW_CUT = 4
-AmountTypes.CHAINSAW_CUTDOWN = 5
+Sawdust.sawdustEnabled = true
+Sawdust.chainsawInUse = false
 
 function Sawdust:initialize()
     self.gameEnv["g_sawdust"] = self
+
+    Utility.overwrittenFunction(Player, "new", ExtendedPlayerChainsaw.player_new)
+    if Player.sawdustOnOff == nil then
+        Player.sawdustOnOff = ExtendedPlayerChainsaw.sawdustOnOff
+    end
+
+    Utility.overwrittenFunction(Chainsaw, "load", ExtendedPlayerChainsaw.chainsaw_load)
+    Utility.overwrittenFunction(Chainsaw, "update", ExtendedPlayerChainsaw.chainsaw_update)
 end
 
 function Sawdust:onValidateVehicleTypes(vehicleTypeManager, addSpecialization, addSpecializationBySpecialization, addSpecializationByVehicleType, addSpecializationByFunction)
@@ -77,56 +73,31 @@ end
 function Sawdust:onMissionStarted()
 end
 
-function Sawdust:onWriteStream(streamId)
-end
-
-function Sawdust:onReadStream(streamId)
-end
-
 function Sawdust:onUpdate(dt)
-    self.showHelp = false
-    if g_currentMission.player and g_currentMission.player.baseInformation.currentHandtool and g_currentMission.player.baseInformation.currentHandtool.cutNode then
-        self:processChainsaw()
-    end
-    if self.showHelp then
-        g_currentMission:addExtraPrintText(g_i18n:getText("SW_DESCLEVEL") .. " " .. tostring(self.sawdustScale))
-    end
-end
-
-function Sawdust:onUpdateTick(dt)
-end
-
-function Sawdust:onWriteUpdateStream(streamId, connection, dirtyMask)
-end
-
-function Sawdust:onReadUpdateStream(streamId, timestamp, connection)
+    self.chainsawInUse = g_currentMission.player and g_currentMission.player.baseInformation.currentHandtool and g_currentMission.player.baseInformation.currentHandtool.cutNode
 end
 
 function Sawdust:onMouseEvent(posX, posY, isDown, isUp, button)
 end
 
-function Sawdust:onKeyEvent(unicode, sym, modifier, isDown)
-    if not isDown then
-        return
-    end
-
-    if self.showHelp == false then
-        return
-    end
-    if sym == Input.KEY_z then
-        if self.sawdustScale == 0 then
-            self.sawdustScale = 3
-        elseif self.sawdustScale == 3 then
-            self.sawdustScale = 2
-        elseif self.sawdustScale == 2 then
-            self.sawdustScale = 1
-        elseif self.sawdustScale == 1 then
-            self.sawdustScale = 0
-        end
+function Sawdust:sawdustToggle()
+    if self.sawdustEnabled then
+        self.sawdustEnabled = false
+        g_currentMission:showBlinkingWarning(g_i18n:getText("SAWDUST_DISABLED"), 2000)
+    else
+        self.sawdustEnabled = true
+        g_currentMission:showBlinkingWarning(g_i18n:getText("SAWDUST_ENABLED"), 2000)
     end
 end
 
 function Sawdust:onDraw()
+    if self.chainsawInUse then 
+        if self.sawdustEnabled then
+            g_currentMission:addExtraPrintText(g_i18n:getText("SAWDUST_ENABLED"))
+        else
+            g_currentMission:addExtraPrintText(g_i18n:getText("SAWDUST_DISABLED"))
+        end
+    end
 end
 
 function Sawdust:onPreSaveSavegame(savegameDirectory, savegameIndex)
@@ -141,34 +112,7 @@ end
 function Sawdust:onDeleteMap()
 end
 
-
-function Sawdust:processTreeSaw(object)
-    self.showHelp = true
-    local workingToolNode = object.cutNode
-    if workingToolNode ~= nil then -- workaround per i coglioni che usano i treesaw senza un cutnode
-        if object.isCutting then
-            self.treeSawCounter = self.treeSawCounter + (1 * self.sawdustScale)
-        end
-        if self.treeSawCounter > 150 then
-            local x, y, z = getWorldTranslation(workingToolNode)
-            self:addChipToGround(x, y, z, self:calcDelta(AmountTypes.TREESAW_CUT))
-            self.treeSawCounter = 0
-        end
-    end
-end
-
-function Sawdust:processStumpCutter(object)
-    self.showHelp = true
-    if object.curSplitShape ~= nil then
-        self.stumpCutterCounter = self.stumpCutterCounter + (1 * self.sawdustScale)
-    end
-    if self.stumpCutterCounter > 200 then
-        local x, y, z = getWorldTranslation(object.stumpCutterCutNode)
-        self:addChipToGround(x, y, z, self:calcDelta(AmountTypes.STUPCUTTER_CUT))
-        self.stumpCutterCounter = 0
-    end
-end
-
+--[[ 
 function Sawdust:processChainsaw()
     self.showHelp = true
     -- chainsaw delimb
@@ -199,7 +143,9 @@ function Sawdust:processChainsaw()
         end
     end
 end
+]]
 
+--[[ 
 function Sawdust:calcDelta(type)
     local amount = 0
     if type == AmountTypes.CHAINSAW_DELIMB then
@@ -221,20 +167,19 @@ function Sawdust:calcDelta(type)
     print("testDrop: " .. tostring(testDrop))
     return amount * self.sawdustScale
 end
+]]
 
 function Sawdust:addChipToGround(x, y, z, amount)
-    if self.sawdustScale > 0 then
-        if g_currentMission:getIsServer() then
-            local xzRndm = ((math.random(1, 20)) - 10) / 10
-            local xOffset = math.max(math.min(xzRndm, 0.3), -0.3)
-            local zOffset = math.max(math.min(xzRndm, 0.8), -0.1)
-            local ex = x + xOffset
-            local ey = y - 0.1
-            local ez = z + zOffset
-            local outerRadius = DensityMapHeightUtil.getDefaultMaxRadius(FillType.WOODCHIPS)
-            local dropped, lineOffset = DensityMapHeightUtil.tipToGroundAroundLine(nil, amount, FillType.WOODCHIPS, x, y, z, ex, ey, ez, 0, outerRadius, 1, false, nil)
-        else
-            g_client:getServerConnection():sendEvent(SawdustEvent:new(x, y, z, amount))
-        end
+    if g_currentMission:getIsServer() then
+        local xzRndm = ((math.random(1, 20)) - 10) / 10
+        local xOffset = math.max(math.min(xzRndm, 0.3), -0.3)
+        local zOffset = math.max(math.min(xzRndm, 0.8), -0.1)
+        local ex = x + xOffset
+        local ey = y - 0.1
+        local ez = z + zOffset
+        local outerRadius = DensityMapHeightUtil.getDefaultMaxRadius(FillType.WOODCHIPS)
+        local dropped, lineOffset = DensityMapHeightUtil.tipToGroundAroundLine(nil, amount, FillType.WOODCHIPS, x, y, z, ex, ey, ez, 0, outerRadius, 1, false, nil)
+    else
+        g_client:getServerConnection():sendEvent(SawdustEvent:new(x, y, z, amount))
     end
 end

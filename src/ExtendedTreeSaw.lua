@@ -29,10 +29,9 @@ end
 function ExtendedTreeSaw:onUpdateTick(dt, isActiveForInput, isActiveForInputIgnoreSelection, isSelected)
     ---@type any
     local spec = self[ExtendedTreeSaw.SPEC_TABLE_NAME]
-    if self.isServer then
+    if self.isServer and g_sawdust.sawdustEnabled then
         if self.spec_treeSaw.isCutting then
-            local delta = (50 / 1000) * dt
-            delta = delta * g_sawdust.sawdustScale
+            local delta = (70 / 1000) * dt
             spec.sawdustBuffer = spec.sawdustBuffer + delta
         end
         if spec.sawdustBuffer >= spec.sawdustBufferMax then
