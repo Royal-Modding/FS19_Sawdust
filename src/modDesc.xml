@@ -28,6 +28,7 @@ Le mod Sciure simule la chute de copeaux de bois au sol lors de l'abattage d'arb
 		<specialization name="extendedWoodHarvester" className="ExtendedWoodHarvester" filename="ExtendedWoodHarvester.lua" />
 		<specialization name="extendedStumpCutter" className="ExtendedStumpCutter" filename="ExtendedStumpCutter.lua" />
 		<specialization name="extendedTreeSaw" className="ExtendedTreeSaw" filename="ExtendedTreeSaw.lua" />
+		<specialization name="extendedWoodCrusher" className="ExtendedWoodCrusher" filename="ExtendedWoodCrusher.lua" />
 	</specializations>
 	<extraSourceFiles>
 		<sourceFile filename="lib/rmod/Main.lua" />
@@ -42,7 +43,7 @@ Le mod Sciure simule la chute de copeaux de bois au sol lors de l'abattage d'arb
 
 	<inputBinding>
 		<actionBinding action="SAWDUST_ONOFF">
-			<binding device="KB_MOUSE_DEFAULT" input="KEY_z" />
+			<binding device="KB_MOUSE_DEFAULT" input="KEY_lshift KEY_z" />
 		</actionBinding>
 	</inputBinding>
 

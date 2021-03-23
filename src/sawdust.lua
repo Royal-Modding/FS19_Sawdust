@@ -29,6 +29,7 @@ function Sawdust:onValidateVehicleTypes(vehicleTypeManager, addSpecialization, a
     addSpecializationBySpecialization("extendedWoodHarvester", "woodHarvester")
     addSpecializationBySpecialization("extendedStumpCutter", "stumpCutter")
     addSpecializationBySpecialization("extendedTreeSaw", "treeSaw")
+    addSpecializationBySpecialization("extendedWoodCrusher", "woodCrusher")
 end
 
 function Sawdust:onMissionInitialize(baseDirectory, missionCollaborators)
@@ -65,6 +66,17 @@ function Sawdust:onPreLoadOnCreateLoadedObjects(xmlFile)
 end
 
 function Sawdust:onLoadFinished()
+    self.sawdustFadeMessage =
+        FadeEffect:new(
+        {
+            position = {x = 0.5, y = g_safeFrameOffsetY * 2},
+            align = {x = FadeEffect.ALIGNS.CENTER, y = FadeEffect.ALIGNS.BOTTOM},
+            size = 0.024,
+            shadow = true,
+            shadowPosition = {x = 0.0016, y = 0.0016},
+            statesTime = {0.75, 3, 0.95}
+        }
+    )
 end
 
 function Sawdust:onStartMission()
@@ -74,30 +86,23 @@ function Sawdust:onMissionStarted()
 end
 
 function Sawdust:onUpdate(dt)
+    self.sawdustFadeMessage:update(dt)
     self.chainsawInUse = g_currentMission.player and g_currentMission.player.baseInformation.currentHandtool and g_currentMission.player.baseInformation.currentHandtool.cutNode
-end
-
-function Sawdust:onMouseEvent(posX, posY, isDown, isUp, button)
-end
-
-function Sawdust:sawdustToggle()
-    if self.sawdustEnabled then
-        self.sawdustEnabled = false
-        g_currentMission:showBlinkingWarning(g_i18n:getText("SAWDUST_DISABLED"), 2000)
-    else
-        self.sawdustEnabled = true
-        g_currentMission:showBlinkingWarning(g_i18n:getText("SAWDUST_ENABLED"), 2000)
-    end
-end
-
-function Sawdust:onDraw()
-    if self.chainsawInUse then 
+    if self.chainsawInUse or self.printText then
         if self.sawdustEnabled then
             g_currentMission:addExtraPrintText(g_i18n:getText("SAWDUST_ENABLED"))
         else
             g_currentMission:addExtraPrintText(g_i18n:getText("SAWDUST_DISABLED"))
         end
+        self.printText = false
     end
+end
+
+function Sawdust:onMouseEvent(posX, posY, isDown, isUp, button)
+end
+
+function Sawdust:onDraw()
+    self.sawdustFadeMessage:draw()
 end
 
 function Sawdust:onPreSaveSavegame(savegameDirectory, savegameIndex)
@@ -112,64 +117,17 @@ end
 function Sawdust:onDeleteMap()
 end
 
---[[ 
-function Sawdust:processChainsaw()
-    self.showHelp = true
-    -- chainsaw delimb
-    if g_currentMission.player.baseInformation.currentHandtool.particleSystems[1].isEmitting and not g_currentMission.player.baseInformation.currentHandtool.isCutting then
-        if math.random(10) > (8 - self.sawdustScale) then
-            self.chainsawCounter = self.chainsawCounter + (1 * self.sawdustScale)
-        end
-        if self.chainsawCounter > 100 then
-            local x, y, z = getWorldTranslation(g_currentMission.player.baseInformation.currentHandtool.cutNode)
-            self:addChipToGround(x, y, z, self:calcDelta(AmountTypes.CHAINSAW_DELIMB))
-            self.chainsawCounter = 0
-        end
-    end
-    -- chainsaw cut
-    if g_currentMission.player.baseInformation.currentHandtool.isCutting then
-        self.chainsawCounter = self.chainsawCounter + (1 * self.sawdustScale)
-        if g_currentMission.player.baseInformation.currentHandtool.waitingForResetAfterCut then
-            if g_currentMission.player.baseInformation.currentHandtool.isHorizontalCut and self.chainsawCounter > 220 then
-                local x, y, z = getWorldTranslation(g_currentMission.player.baseInformation.currentHandtool.cutNode)
-                self:addChipToGround(x, y, z, self:calcDelta(AmountTypes.CHAINSAW_CUTDOWN))
-                self.chainsawCounter = 0
-            end
-            if not g_currentMission.player.baseInformation.currentHandtool.isHorizontalCut and self.chainsawCounter > 220 then
-                local x, y, z = getWorldTranslation(g_currentMission.player.baseInformation.currentHandtool.cutNode)
-                self:addChipToGround(x, y, z, self:calcDelta(AmountTypes.CHAINSAW_CUT))
-                self.chainsawCounter = 0
-            end
-        end
+function Sawdust:sawdustToggle()
+    if self.sawdustEnabled then
+        self.sawdustEnabled = false
+        self.sawdustFadeMessage:play(string.format("%s", g_i18n:getText("SAWDUST_DISABLED")))
+    else
+        self.sawdustEnabled = true
+        self.sawdustFadeMessage:play(string.format("%s", g_i18n:getText("SAWDUST_ENABLED")))
     end
 end
-]]
 
---[[ 
-function Sawdust:calcDelta(type)
-    local amount = 0
-    if type == AmountTypes.CHAINSAW_DELIMB then
-        amount = math.random(40, 50)
-    elseif type == AmountTypes.CHAINSAW_CUTDOWN then
-        amount = math.random(60, 70)
-    elseif type == AmountTypes.CHAINSAW_CUT then
-        amount = math.random(50, 60)
-    elseif type == AmountTypes.WOODHARVESTER_CUT then
-        amount = math.random(50, 70)
-    elseif type == AmountTypes.STUPCUTTER_CUT then
-        amount = math.random(45, 60)
-    elseif type == AmountTypes.TREESAW_CUT then
-        amount = math.random(45, 65)
-    end
-    local fillTypeIndex = g_fillTypeManager:getFillTypeIndexByName("WOODCHIPS")
-    local testDrop = g_densityMapHeightManager:getMinValidLiterValue(fillTypeIndex)
-    --return math.max(DensityMapHeightManager.getMinValidLiterValue(fillTypeIndex), amount * self.totalSawdust);
-    print("testDrop: " .. tostring(testDrop))
-    return amount * self.sawdustScale
-end
-]]
-
-function Sawdust:addChipToGround(x, y, z, amount)
+function Sawdust:addChipToGround(x, y, z, amount, caller)
     if g_currentMission:getIsServer() then
         local xzRndm = ((math.random(1, 20)) - 10) / 10
         local xOffset = math.max(math.min(xzRndm, 0.3), -0.3)
@@ -179,7 +137,12 @@ function Sawdust:addChipToGround(x, y, z, amount)
         local ez = z + zOffset
         local outerRadius = DensityMapHeightUtil.getDefaultMaxRadius(FillType.WOODCHIPS)
         local dropped, lineOffset = DensityMapHeightUtil.tipToGroundAroundLine(nil, amount, FillType.WOODCHIPS, x, y, z, ex, ey, ez, 0, outerRadius, 1, false, nil)
+        g_logManager:devInfo("Sawdust calculated [%s]  ::  dropped [%s]  ::  caller [%s]", amount, dropped, caller)
     else
-        g_client:getServerConnection():sendEvent(SawdustEvent:new(x, y, z, amount))
+        g_logManager:devError("[%s] addChipToGround can be called server-side only!", self.name)
     end
+end
+
+function Sawdust:addPrintText()
+    self.printText = true
 end

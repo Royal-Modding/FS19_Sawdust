@@ -23,7 +23,9 @@ function ExtendedPlayerChainsaw:player_new(superFunc, isServer, isClient)
 end
 
 function ExtendedPlayerChainsaw:sawdustOnOff()
-    Sawdust:sawdustToggle()
+    if g_sawdust.chainsawInUse then
+        Sawdust:sawdustToggle()
+    end
 end
 
 function ExtendedPlayerChainsaw:chainsaw_load(superFunc, ...)
@@ -33,14 +35,14 @@ function ExtendedPlayerChainsaw:chainsaw_load(superFunc, ...)
 end
 
 function ExtendedPlayerChainsaw:chainsaw_update(superFunc, dt, isActive)
-    if self.isServer and g_sawdust.sawdustEnabled then    
+    if self.isServer and g_sawdust.sawdustEnabled then
         if self.isCutting then
             local delta = (20 / 1000) * dt
             self.chainSawBuffer = self.chainSawBuffer + delta
         end
         if self.chainSawBuffer >= self.chainSawBufferMax then
             local x, y, z = getWorldTranslation(self.cutNode)
-            g_sawdust:addChipToGround(x, y, z, self.chainSawBuffer)
+            g_sawdust:addChipToGround(x, y, z, self.chainSawBuffer, "player")
             self.chainSawBuffer = 0
         end
     end
