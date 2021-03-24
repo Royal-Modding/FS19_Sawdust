@@ -53,11 +53,11 @@ function ExtendedWoodHarvester:onUpdateTick(dt, isActiveForInput, isActiveForInp
     if self.isServer and g_sawdust.sawdustEnabled then
         local diameterScale = self.spec_woodHarvester.lastDiameter
         if self.spec_woodHarvester.isCutSamplePlaying then
-            local delta = ((200 * diameterScale) / 1000) * dt
+            local delta = ((50 + (diameterScale * 100)) / 1000) * dt
             spec.sawdustBuffer = spec.sawdustBuffer + delta
         end
         if self:getIsTurnedOn() and self.spec_woodHarvester.isDelimbSamplePlaying then
-            local delta = ((250 * diameterScale) / 1000) * dt
+            local delta = ((70 + (diameterScale * 100)) / 1000) * dt
             spec.sawdustBuffer = spec.sawdustBuffer + delta
         end
         if spec.sawdustBuffer >= spec.sawdustBufferMax then

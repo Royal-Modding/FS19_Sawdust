@@ -52,7 +52,7 @@ function ExtendedWoodCrusher:onUpdateTick(dt, isActiveForInput, isActiveForInput
     local spec = self[ExtendedWoodCrusher.SPEC_TABLE_NAME]
     if self.isServer and g_sawdust.sawdustEnabled then
         if self:getIsTurnedOn() and self.spec_woodCrusher.crushingTime > 0 then
-            local delta = (20 / 1000) * dt
+            local delta = (10 / 1000) * dt
             spec.sawdustBuffer = spec.sawdustBuffer + delta
         end
         if spec.sawdustBuffer >= spec.sawdustBufferMax then
