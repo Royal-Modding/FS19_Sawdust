@@ -63,5 +63,5 @@ function ExtendedTreeSaw:onUpdateTick(dt, isActiveForInput, isActiveForInputIgno
 end
 
 function ExtendedTreeSaw.sawdustToggle()
-    g_sawdust:sawdustToggle()
+    SawdustEvent.sendEvent(not g_sawdust.sawdustEnabled)
 end

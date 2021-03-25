@@ -23,8 +23,10 @@ function ExtendedPlayerChainsaw:player_new(superFunc, isServer, isClient)
 end
 
 function ExtendedPlayerChainsaw:sawdustOnOff()
+    print("1")
     if g_sawdust.chainsawInUse then
-        Sawdust:sawdustToggle()
+        print("2")
+        SawdustEvent.sendEvent(not g_sawdust.sawdustEnabled)
     end
 end
 

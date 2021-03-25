@@ -23,6 +23,18 @@ function Sawdust:initialize()
 
     Utility.overwrittenFunction(Chainsaw, "load", ExtendedPlayerChainsaw.chainsaw_load)
     Utility.overwrittenFunction(Chainsaw, "update", ExtendedPlayerChainsaw.chainsaw_update)
+
+    self.sawdustFadeMessage =
+        FadeEffect:new(
+        {
+            position = {x = 0.5, y = g_safeFrameOffsetY * 2},
+            align = {x = FadeEffect.ALIGNS.CENTER, y = FadeEffect.ALIGNS.BOTTOM},
+            size = 0.024,
+            shadow = true,
+            shadowPosition = {x = 0.0016, y = 0.0016},
+            statesTime = {0.75, 3, 0.95}
+        }
+    )
 end
 
 function Sawdust:onValidateVehicleTypes(vehicleTypeManager, addSpecialization, addSpecializationBySpecialization, addSpecializationByVehicleType, addSpecializationByFunction)
@@ -39,6 +51,7 @@ function Sawdust:onSetMissionInfo(missionInfo, missionDynamicInfo)
 end
 
 function Sawdust:onLoad()
+    g_messageCenter:subscribe(MessageType.USER_ADDED, self.onAddPlayer, self)
 end
 
 function Sawdust:onPreLoadMap(mapFile)
@@ -48,6 +61,12 @@ function Sawdust:onCreateStartPoint(startPointNode)
 end
 
 function Sawdust:onLoadMap(mapNode, mapFile)
+end
+
+function Sawdust:onAddPlayer()
+    if g_server ~= nil then
+        SawdustEvent.sendEvent(self.sawdustEnabled)
+    end
 end
 
 function Sawdust:onPostLoadMap(mapNode, mapFile)
@@ -66,17 +85,6 @@ function Sawdust:onPreLoadOnCreateLoadedObjects(xmlFile)
 end
 
 function Sawdust:onLoadFinished()
-    self.sawdustFadeMessage =
-        FadeEffect:new(
-        {
-            position = {x = 0.5, y = g_safeFrameOffsetY * 2},
-            align = {x = FadeEffect.ALIGNS.CENTER, y = FadeEffect.ALIGNS.BOTTOM},
-            size = 0.024,
-            shadow = true,
-            shadowPosition = {x = 0.0016, y = 0.0016},
-            statesTime = {0.75, 3, 0.95}
-        }
-    )
 end
 
 function Sawdust:onStartMission()
@@ -117,13 +125,14 @@ end
 function Sawdust:onDeleteMap()
 end
 
-function Sawdust:sawdustToggle()
-    if self.sawdustEnabled then
-        self.sawdustEnabled = false
-        self.sawdustFadeMessage:play(string.format("%s", g_i18n:getText("SAWDUST_DISABLED")))
-    else
-        self.sawdustEnabled = true
-        self.sawdustFadeMessage:play(string.format("%s", g_i18n:getText("SAWDUST_ENABLED")))
+function Sawdust:sawdustToggle(isEnabled)
+    if isEnabled ~= self.sawdustEnabled then
+        self.sawdustEnabled = isEnabled
+        if not self.sawdustEnabled then
+            self.sawdustFadeMessage:play(string.format("%s", g_i18n:getText("SAWDUST_DISABLED")))
+        else
+            self.sawdustFadeMessage:play(string.format("%s", g_i18n:getText("SAWDUST_ENABLED")))
+        end
     end
 end
 

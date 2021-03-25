@@ -69,5 +69,5 @@ function ExtendedWoodHarvester:onUpdateTick(dt, isActiveForInput, isActiveForInp
 end
 
 function ExtendedWoodHarvester.sawdustToggle()
-    g_sawdust:sawdustToggle()
+    SawdustEvent.sendEvent(not g_sawdust.sawdustEnabled)
 end

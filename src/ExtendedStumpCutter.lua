@@ -64,5 +64,5 @@ function ExtendedStumpCutter:onUpdateTick(dt, isActiveForInput, isActiveForInput
 end
 
 function ExtendedStumpCutter.sawdustToggle()
-    g_sawdust:sawdustToggle()
+    SawdustEvent.sendEvent(not g_sawdust.sawdustEnabled)
 end
