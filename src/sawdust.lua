@@ -42,6 +42,7 @@ function Sawdust:onValidateVehicleTypes(vehicleTypeManager, addSpecialization, a
     addSpecializationBySpecialization("extendedStumpCutter", "stumpCutter")
     addSpecializationBySpecialization("extendedTreeSaw", "treeSaw")
     addSpecializationBySpecialization("extendedWoodCrusher", "woodCrusher")
+    addSpecializationByVehicleType("extendedWoodCrusher", "FS19_jenzBA725.selfPropelledWoodCrusher")
 end
 
 function Sawdust:onMissionInitialize(baseDirectory, missionCollaborators)
@@ -146,7 +147,7 @@ function Sawdust:addChipToGround(x, y, z, amount, caller)
         local ez = z + zOffset
         local outerRadius = DensityMapHeightUtil.getDefaultMaxRadius(FillType.WOODCHIPS)
         local dropped, lineOffset = DensityMapHeightUtil.tipToGroundAroundLine(nil, amount, FillType.WOODCHIPS, x, y, z, ex, ey, ez, 0, outerRadius, 1, false, nil)
-        g_logManager:devInfo("Sawdust calculated [%s]  ::  dropped [%s]  ::  caller [%s]", amount, dropped, caller)
+        --g_logManager:devInfo("Sawdust calculated [%s]  ::  dropped [%s]  ::  caller [%s]", amount, dropped, caller)
     else
         g_logManager:devError("[%s] addChipToGround can be called server-side only!", self.name)
     end
