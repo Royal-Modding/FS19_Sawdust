@@ -27,7 +27,7 @@ function Sawdust:initialize()
     self.sawdustFadeMessage =
         FadeEffect:new(
         {
-            position = {x = 0.5, y = g_safeFrameOffsetY * 2},
+            position = {x = 0.5, y = g_safeFrameOffsetY * 3},
             align = {x = FadeEffect.ALIGNS.CENTER, y = FadeEffect.ALIGNS.BOTTOM},
             size = 0.024,
             shadow = true,
@@ -38,7 +38,10 @@ function Sawdust:initialize()
 end
 
 function Sawdust:onValidateVehicleTypes(vehicleTypeManager, addSpecialization, addSpecializationBySpecialization, addSpecializationByVehicleType, addSpecializationByFunction)
-    addSpecializationBySpecialization("extendedWoodHarvester", "woodHarvester")
+    -- avoid loading if mod RealWoodHarvester by kenny456
+    if not g_modIsLoaded["FS19_RealWoodHarvester"] then
+        addSpecializationBySpecialization("extendedWoodHarvester", "woodHarvester")
+    end
     addSpecializationBySpecialization("extendedStumpCutter", "stumpCutter")
     addSpecializationBySpecialization("extendedTreeSaw", "treeSaw")
     addSpecializationBySpecialization("extendedWoodCrusher", "woodCrusher")
@@ -139,6 +142,7 @@ end
 
 function Sawdust:addChipToGround(x, y, z, amount, caller)
     if g_currentMission:getIsServer() then
+        --g_logManager:devInfo("Sawdust calculated [%s]  ::  dropped [%s]  ::  caller [%s]", amount, dropped, caller)
         local xzRndm = ((math.random(1, 20)) - 10) / 10
         local xOffset = math.max(math.min(xzRndm, 0.3), -0.3)
         local zOffset = math.max(math.min(xzRndm, 0.8), -0.1)
@@ -147,7 +151,6 @@ function Sawdust:addChipToGround(x, y, z, amount, caller)
         local ez = z + zOffset
         local outerRadius = DensityMapHeightUtil.getDefaultMaxRadius(FillType.WOODCHIPS)
         local dropped, lineOffset = DensityMapHeightUtil.tipToGroundAroundLine(nil, amount, FillType.WOODCHIPS, x, y, z, ex, ey, ez, 0, outerRadius, 1, false, nil)
-        --g_logManager:devInfo("Sawdust calculated [%s]  ::  dropped [%s]  ::  caller [%s]", amount, dropped, caller)
     else
         g_logManager:devError("[%s] addChipToGround can be called server-side only!", self.name)
     end

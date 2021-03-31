@@ -6,6 +6,7 @@
 
 ---@class ExtendedWoodCrusher
 ---@field spec_woodCrusher any
+---@field spec_advancedWoodCrusher any
 ---@field isServer any
 ---@field getIsTurnedOn function
 ---@field getRootVehicle function
@@ -50,13 +51,14 @@ end
 function ExtendedWoodCrusher:onUpdateTick(dt, isActiveForInput, isActiveForInputIgnoreSelection, isSelected)
     ---@type any
     local spec = self[ExtendedWoodCrusher.SPEC_TABLE_NAME]
+    local woodCrusherSpec = self.spec_woodCrusher or self.spec_advancedWoodCrusher
     if self.isServer and g_sawdust.sawdustEnabled then
-        if self:getIsTurnedOn() and self.spec_woodCrusher.crushingTime > 0 then
+        if self:getIsTurnedOn() and woodCrusherSpec.crushingTime > 0 then
             local delta = (8 / 1000) * dt
             spec.sawdustBuffer = spec.sawdustBuffer + delta
         end
         if spec.sawdustBuffer >= spec.sawdustBufferMax then
-            local x, y, z = getWorldTranslation(self.spec_woodCrusher.cutNode)
+            local x, y, z = getWorldTranslation(woodCrusherSpec.cutNode)
             -- avoid dust under machinery
             x = x + ((math.random() * 2) + 1.5) * Utility.randomSign()
             z = z + ((math.random() * 2) + 1.5) * Utility.randomSign()
@@ -68,5 +70,4 @@ end
 
 function ExtendedWoodCrusher.sawdustToggle()
     SawdustEvent.sendEvent(not g_sawdust.sawdustEnabled)
-    print("toggle")
 end
