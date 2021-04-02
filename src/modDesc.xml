@@ -21,6 +21,11 @@ Holzschnitzel zu Boden vom Entasten, Zuschneiden und Fällen von Bäumen - Engli
 Le mod Sciure simule la chute de copeaux de bois au sol lors de l'abattage d'arbres ou de branches. Les copeaux de bois doivent ensuite être transportés ou nettoyés. Pendant l'utilisation de la tronçonneuse, il est possible de régler l'intensité de la poussière entre 0 (désactivé) et 3 (max). Il est défini sur 2 par défaut. Les copeaux de bois ne seront générés que si le sol permet le basculement du matériau.
 ]]>
 		</fr>
+		<ru>
+			<![CDATA[
+Мод Sawdust моделирует выброс опилок, при рубке деревьев или резки ветвей. Леса должны быть транспортированы или убраны тогда. Когда используется бензопила или лесозаготовочный комбайн захватил бревно, можно установить интенсивность генерации опилок между 0 (выкл) и 3 (макс). Пу омолчанию установлено на 2. Опилки будут генерироваться только в том случае, если на этом участке позволяется материал выгружать на землю.
+]]>
+		</ru>
 	</description>
 	<multiplayer supported="true" />
 	<iconFilename>icon.png</iconFilename>
@@ -54,18 +59,24 @@ Le mod Sciure simule la chute de copeaux de bois au sol lors de l'abattage d'arb
 			<de>Aktivieren / Deaktivieren Hackschnitzel</de>
 			<fr>Activer / désactiver les copeaux de bois</fr>
 			<it>Abilita/Disabilita generazione segatura</it>
+			<ru>Образование опилок вкл/выкл</ru>
+			<pl>Włącz/Wyłącz trociny z piły</pl>
 		</text>
 		<text name="SAWDUST_ENABLED">
 			<en>Sawdust dirt enabled</en>
 			<de>Sägespäne Generation aktiviert</de>
 			<fr>Génération de sciure activée</fr>
 			<it>Generazione segatura abilitata</it>
+			<ru>Создание опилок включено</ru>
+			<pl>Trociny z piły włączone</pl>
 		</text>
 		<text name="SAWDUST_DISABLED">
 			<en>Sawdust dirt disabled</en>
 			<de>Sägespäne Generation deaktiviert</de>
 			<fr>Génération de sciure désactivée</fr>
 			<it>Generazione segatura disabilitata</it>
+			<ru>Создание опилок отключено</ru>
+			<pl>Trociny z piły wyłączona</pl>
 		</text>
 	</l10n>
 
