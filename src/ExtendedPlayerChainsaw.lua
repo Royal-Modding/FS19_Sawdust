@@ -17,9 +17,15 @@ function ExtendedPlayerChainsaw:player_new(superFunc, isServer, isClient)
         activeType = Player.INPUT_ACTIVE_TYPE.STARTS_ENABLED,
         callbackState = nil,
         text = "",
-        textVisibility = false
+        textVisibility = true
     }
     return self
+end
+
+function ExtendedPlayerChainsaw:updateActionEvents()
+    local eventId = self.inputInformation.registrationList[InputAction.SAWDUST_ONOFF].eventId
+    g_inputBinding:setActionEventActive(eventId, g_sawdust.chainsawInUse ~= nil)
+    g_inputBinding:setActionEventTextVisibility(eventId, g_sawdust.chainsawInUse ~= nil)
 end
 
 function ExtendedPlayerChainsaw:sawdustOnOff()

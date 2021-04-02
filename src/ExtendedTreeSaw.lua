@@ -35,7 +35,7 @@ function ExtendedTreeSaw:onRegisterActionEvents(isActiveForInput, isActiveForInp
     local spec = self[ExtendedTreeSaw.SPEC_TABLE_NAME]
     if self:getIsActiveForInput(true, true) then
         local _, actionEventId = self:addActionEvent(spec.actionEvents, InputAction.SAWDUST_ONOFF, self, ExtendedTreeSaw.sawdustToggle, false, true, false, true, nil, nil, true)
-        g_inputBinding:setActionEventTextVisibility(actionEventId, false)
+        g_inputBinding:setActionEventTextVisibility(actionEventId, true)
     end
 end
 

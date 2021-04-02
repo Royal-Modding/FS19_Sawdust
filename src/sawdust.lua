@@ -11,7 +11,7 @@ InitRoyalUtility(Utils.getFilename("lib/utility/", g_currentModDirectory))
 Sawdust = RoyalMod.new(r_debug_r, false)
 Sawdust.directory = g_currentModDirectory
 Sawdust.sawdustEnabled = true
-Sawdust.chainsawInUse = false
+Sawdust.chainsawInUse = nil
 
 function Sawdust:initialize()
     self.gameEnv["g_sawdust"] = self
@@ -20,6 +20,7 @@ function Sawdust:initialize()
     if Player.sawdustOnOff == nil then
         Player.sawdustOnOff = ExtendedPlayerChainsaw.sawdustOnOff
     end
+    Utility.appendedFunction(Player, "updateActionEvents", ExtendedPlayerChainsaw.updateActionEvents)
 
     Utility.overwrittenFunction(Chainsaw, "load", ExtendedPlayerChainsaw.chainsaw_load)
     Utility.overwrittenFunction(Chainsaw, "update", ExtendedPlayerChainsaw.chainsaw_update)
