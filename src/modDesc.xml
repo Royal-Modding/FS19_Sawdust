@@ -60,6 +60,7 @@ Le mod Sciure simule la chute de copeaux de bois au sol lors de l'abattage d'arb
 			<fr>Activer / désactiver les copeaux de bois</fr>
 			<it>Abilita/Disabilita generazione segatura</it>
 			<ru>Образование опилок вкл/выкл</ru>
+			<pl>Włącz/Wyłącz trociny z piły</pl>
 		</text>
 		<text name="SAWDUST_ENABLED">
 			<en>Sawdust dirt enabled</en>
@@ -67,6 +68,7 @@ Le mod Sciure simule la chute de copeaux de bois au sol lors de l'abattage d'arb
 			<fr>Génération de sciure activée</fr>
 			<it>Generazione segatura abilitata</it>
 			<ru>Создание опилок включено</ru>
+			<pl>Trociny z piły włączone</pl>
 		</text>
 		<text name="SAWDUST_DISABLED">
 			<en>Sawdust dirt disabled</en>
@@ -74,6 +76,7 @@ Le mod Sciure simule la chute de copeaux de bois au sol lors de l'abattage d'arb
 			<fr>Génération de sciure désactivée</fr>
 			<it>Generazione segatura disabilitata</it>
 			<ru>Создание опилок отключено</ru>
+			<pl>Trociny z piły wyłączona</pl>
 		</text>
 	</l10n>
 
