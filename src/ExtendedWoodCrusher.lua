@@ -37,7 +37,8 @@ function ExtendedWoodCrusher:onRegisterActionEvents(isActiveForInput, isActiveFo
     local spec = self[ExtendedWoodCrusher.SPEC_TABLE_NAME]
     if self:getIsActiveForInput(true, true) then
         local _, actionEventId = self:addActionEvent(spec.actionEvents, InputAction.SAWDUST_ONOFF, self, ExtendedWoodCrusher.sawdustToggle, false, true, false, true, nil, nil, true)
-        g_inputBinding:setActionEventTextVisibility(actionEventId, false)
+        g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_NORMAL)
+        g_inputBinding:setActionEventTextVisibility(actionEventId, true)
     end
 end
 

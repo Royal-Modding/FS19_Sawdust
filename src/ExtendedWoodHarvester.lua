@@ -36,7 +36,8 @@ function ExtendedWoodHarvester:onRegisterActionEvents(isActiveForInput, isActive
     local spec = self[ExtendedWoodHarvester.SPEC_TABLE_NAME]
     if self:getIsActiveForInput(true, true) then
         local _, actionEventId = self:addActionEvent(spec.actionEvents, InputAction.SAWDUST_ONOFF, self, ExtendedWoodHarvester.sawdustToggle, false, true, false, true, nil, nil, true)
-        g_inputBinding:setActionEventTextVisibility(actionEventId, false)
+        g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_NORMAL)
+        g_inputBinding:setActionEventTextVisibility(actionEventId, true)
     end
 end
 
